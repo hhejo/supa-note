@@ -2,10 +2,11 @@
 
 간단한 노트 앱
 
-사용 기술
-
-- Next.js
-- Supabase
+- `TypeScript`
+- `Next.js`
+  - `npx create-next-app@latest`
+- `Supabase`
+- `TailwindCSS`
 
 ## Firebase v Supabase
 
