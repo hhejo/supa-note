@@ -1,4 +1,4 @@
-# 수 퍼 노 트
+# 수 파 노 트
 
 간단한 노트 앱
 
@@ -82,6 +82,48 @@ const supabase = createClient(
 const { data, error } = await supabase.from('countries').select('*');
 ```
 
+특정 필드만 쿼리
+
+```javascript
+const { data, error } = await supabase.from('countries').select('name');
+```
+
+다른 테이블 JOIN
+
+```javascript
+const { data, error } = await supabase
+  .from('countries')
+  .select(`name, cities(name)`);
+```
+
+결과 개수 카운트 쿼리
+
+```javascript
+const { count, error } = await supabase
+  .from('countries')
+  .select('*', { count: 'exact', head: true });
+```
+
+JSON 필드 쿼리
+
+```javascript
+const { data, error } = await supabase
+  .from('users')
+  .select(`id, name, address->city`);
+```
+
+복잡한 검색 기능 구현 (textSearch 함수)
+
+```javascript
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat or cat'`, {
+    type: 'websearch',
+    config: 'english',
+  });
+```
+
 ### Insert
 
 데이터 삽입
@@ -99,6 +141,15 @@ const { data, error } = await supabase
   .from('countries')
   .insert({ id: 1, name: 'Denmark' })
   .select();
+```
+
+한번에 여러 Row 삽입
+
+```javascript
+const { error } = await supabase.from('countries').insert([
+  { id: 1, name: 'Nepal' },
+  { id: 1, name: 'Vietnam' },
+]);
 ```
 
 ### Update
@@ -122,6 +173,16 @@ const { error } = await supabase
   .select();
 ```
 
+JSON 데이터 업데이트
+
+```javascript
+const { data, error } = await supabase
+  .from('users')
+  .update({ address: { street: 'Melrose Place', postcode: 90210 } })
+  .eq('address->postcode', 90210)
+  .select();
+```
+
 ### Upsert
 
 한 Row Upsert 쿼리
@@ -130,6 +191,30 @@ const { error } = await supabase
 const { data, error } = await supabase
   .from('countries')
   .upsert({ id: 1, name: 'Albania' })
+  .select();
+```
+
+한번에 여러 Row Upsert 쿼리
+
+```javascript
+const { data, error } = await supabase
+  .from('countries')
+  .upsert([
+    { id: 1, name: 'Albania' },
+    { id: 2, name: 'Algeria' },
+  ])
+  .select();
+```
+
+id가 아닌 다른 필드로 Upsert
+
+```javascript
+const { data, error } = await supabase
+  .from('users')
+  .upsert(
+    { id: 42, handle: 'saoirse', display_name: 'Saoirse' },
+    { onConflict: 'handle' }
+  )
   .select();
 ```
 
@@ -151,18 +236,8 @@ const { data, error } = await supabase
   .select();
 ```
 
-SUPABASE
+여러 Row 제거
 
-SUPABASE
-
-SUPABASE
-
-SUPABASE
-
-SUPABASE
-
-SUPABASE
-
-SUPABASE
-
-SUPABASE
+```javascript
+const response = await supabase.from('countries').delete().in('id', [1, 2, 3]);
+```
