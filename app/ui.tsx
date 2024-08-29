@@ -15,9 +15,13 @@ export default function UI() {
   const [notes, setNotes] = useState<
     Database['public']['Tables']['note']['Row'][]
   >([]);
+  const [search, setSearch] = useState('');
 
   const fetchNotes = async () => {
-    const { data, error } = await supabase.from('note').select('*');
+    const { data, error } = await supabase
+      .from('note')
+      .select('*')
+      .ilike('title', `%${search}%`);
     if (error) {
       alert(error.message);
       return;
@@ -29,6 +33,10 @@ export default function UI() {
     fetchNotes();
   }, []);
 
+  useEffect(() => {
+    fetchNotes();
+  }, [search]);
+
   return (
     <main className="w-full h-screen flex flex-col">
       <Header />
@@ -38,6 +46,8 @@ export default function UI() {
           setActiveNoteId={setActiveNoteId}
           setIsCreating={setIsCreating}
           notes={notes}
+          setSearch={setSearch}
+          search={search}
         />
         {isCreating ? (
           <NewNote
